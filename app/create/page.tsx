@@ -1,194 +1,176 @@
 "use client";
 
 import { useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useRouter } from "next/navigation";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
 export default function CreatePage() {
+  const router = useRouter();
+
   const [title, setTitle] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit],
+    content: "",
     immediatelyRender: false,
-
-    editorProps: {
-      attributes: {
-        class:
-          "min-h-[60vh] outline-none text-base leading-7 text-neutral-800",
-      },
-    },
   });
 
-  if (!editor) {
-    return null;
-  }
-
   const savePost = async () => {
-    setMessage("");
-
     if (!title.trim()) {
-      setMessage("Please add a title.");
+      setMessage("Please enter a title.");
       return;
     }
 
-    if (!editor.getText().trim()) {
+    if (!editor) {
+      setMessage("Editor is not ready.");
+      return;
+    }
+
+    const content = editor.getText().trim();
+
+    if (!content) {
       setMessage("Please write something first.");
       return;
     }
 
     setSaving(true);
+    setMessage("");
+    setShareUrl("");
 
     try {
       const response = await fetch("/api/posts", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
-          title,
-          content: editor.getHTML(),
+          title: title.trim(),
+          content,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save post.");
+        throw new Error(
+          data.error || "Something went wrong while saving the post."
+        );
       }
 
-      setMessage("Post saved successfully.");
+      const postUrl = `${window.location.origin}/p/${data.post.id}`;
 
-      console.log("Saved post:", data.post);
+      setShareUrl(postUrl);
+      setMessage("Post published successfully.");
+
+      setTitle("");
+      editor.commands.clearContent();
     } catch (error) {
       console.error(error);
 
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong."
+          : "Something went wrong while saving the post."
       );
     } finally {
       setSaving(false);
     }
   };
 
+  const copyLink = async () => {
+    if (!shareUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setMessage("Link copied!");
+    } catch {
+      setMessage("Unable to copy link.");
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-[#fafafa]">
-      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col">
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto w-full max-w-2xl px-5 py-6">
         {/* Header */}
-        <header className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
-          <a
-            href="/"
-            className="text-sm text-neutral-500 hover:text-black"
+        <header className="mb-8 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="text-sm text-gray-500"
           >
             ← Back
-          </a>
-
-          <span className="text-sm font-medium">
-            New post
-          </span>
-
-          <button
-            onClick={savePost}
-            disabled={saving}
-            className="text-sm font-medium text-black disabled:opacity-40"
-          >
-            {saving ? "Saving..." : "Save"}
           </button>
+
+          <h1 className="text-base font-semibold text-gray-900">
+            Create
+          </h1>
+
+          <div className="w-10" />
         </header>
 
+        {/* Title */}
+        <input
+          type="text"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          placeholder="Post title"
+          className="w-full border-0 bg-transparent text-3xl font-bold tracking-tight text-gray-900 outline-none placeholder:text-gray-300"
+        />
+
         {/* Editor */}
-        <section className="flex-1 px-5 py-8 sm:px-8 sm:py-10">
-          {/* Title */}
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Title"
-            className="w-full border-0 bg-transparent text-3xl font-semibold tracking-tight text-neutral-900 outline-none placeholder:text-neutral-300 sm:text-4xl"
+        <div className="mt-6 min-h-[300px]">
+          <EditorContent
+            editor={editor}
+            className="prose prose-gray max-w-none text-gray-800 outline-none"
           />
+        </div>
 
-          {/* Toolbar */}
-          <div className="sticky top-0 z-10 my-6 flex gap-1 overflow-x-auto border-y border-neutral-200 bg-[#fafafa] py-2">
-            <button
-              type="button"
-              onClick={() =>
-                editor.chain().focus().toggleBold().run()
-              }
-              className={`rounded-lg px-3 py-2 text-sm font-bold hover:bg-neutral-200 ${
-                editor.isActive("bold")
-                  ? "bg-neutral-200"
-                  : ""
-              }`}
-            >
-              B
-            </button>
+        {/* Status */}
+        {message && (
+          <p className="mt-4 text-sm text-gray-500">
+            {message}
+          </p>
+        )}
 
-            <button
-              type="button"
-              onClick={() =>
-                editor.chain().focus().toggleItalic().run()
-              }
-              className={`rounded-lg px-3 py-2 text-sm italic hover:bg-neutral-200 ${
-                editor.isActive("italic")
-                  ? "bg-neutral-200"
-                  : ""
-              }`}
-            >
-              I
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .toggleBulletList()
-                  .run()
-              }
-              className={`rounded-lg px-3 py-2 text-sm hover:bg-neutral-200 ${
-                editor.isActive("bulletList")
-                  ? "bg-neutral-200"
-                  : ""
-              }`}
-            >
-              • List
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .toggleOrderedList()
-                  .run()
-              }
-              className={`rounded-lg px-3 py-2 text-sm hover:bg-neutral-200 ${
-                editor.isActive("orderedList")
-                  ? "bg-neutral-200"
-                  : ""
-              }`}
-            >
-              1. List
-            </button>
-          </div>
-
-          {/* Content */}
-          <EditorContent editor={editor} />
-
-          {/* Status */}
-          {message && (
-            <p className="mt-6 text-sm text-neutral-500">
-              {message}
+        {/* Share card */}
+        {shareUrl && (
+          <div className="mt-6 rounded-xl border border-gray-200 p-4">
+            <p className="mb-3 text-sm font-medium text-gray-900">
+              Your LocaPost is live 🎉
             </p>
-          )}
-        </section>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="min-w-0 flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-600 outline-none"
+              />
+
+              <button
+                type="button"
+                onClick={copyLink}
+                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Save */}
+        <button
+          type="button"
+          onClick={savePost}
+          disabled={saving}
+          className="mt-8 w-full rounded-xl bg-black py-3 text-sm font-medium text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {saving ? "Publishing..." : "Publish"}
+        </button>
       </div>
     </main>
   );
