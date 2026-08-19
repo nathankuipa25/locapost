@@ -1,6 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export async function GET() {
+  try {
+    const posts = await prisma.post.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({ posts });
+  } catch (error) {
+    console.error("GET /api/posts error:", error);
+
+    return NextResponse.json(
+      {
+        error: "Something went wrong while fetching posts.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -14,10 +35,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Safe debugging: logs only the database hostname, never the password.
-    const databaseHost = process.env.DATABASE_URL?.match(/@([^/]+)/)?.[1];
+    const databaseHost =
+      process.env.DATABASE_URL?.match(/@([^/]+)/)?.[1];
 
-    console.log("POST /api/posts");
     console.log("DATABASE HOST:", databaseHost ?? "DATABASE_URL missing");
 
     const post = await prisma.post.create({
