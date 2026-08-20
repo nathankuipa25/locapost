@@ -56,12 +56,9 @@ export default function CreatePage() {
 
     return firstParagraph.content
       .filter(
-        (
-          node
-        ): node is typeof node & {
-          text: string;
-        } =>
+        (node): node is { type: "text"; text: string } =>
           node.type === "text" &&
+          "text" in node &&
           typeof node.text === "string"
       )
       .map((node) => node.text)
@@ -117,7 +114,7 @@ export default function CreatePage() {
         );
       }
 
-      const postUrl = `${window.location.origin}/article/${data.post.id}`;
+      const postUrl = `\( {window.location.origin}/article/ \){data.post.id}`;
 
       setShareUrl(postUrl);
       setMessage("Article published successfully 🎉");
