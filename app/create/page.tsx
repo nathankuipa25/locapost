@@ -20,8 +20,11 @@ export default function CreatePage() {
         },
       }),
     ],
+
     content: "",
+
     immediatelyRender: false,
+
     editorProps: {
       attributes: {
         class:
@@ -30,25 +33,38 @@ export default function CreatePage() {
     },
   });
 
+  /*
+   * Use the first meaningful paragraph as the article title.
+   * Tiptap's JSON nodes don't all have a `text` property,
+   * so we explicitly narrow the type before accessing it.
+   */
   const getTitle = () => {
     if (!editor) return "";
 
     const json = editor.getJSON();
 
-    const firstTextNode = json.content?.find(
+    const firstParagraph = json.content?.find(
       (node) =>
         node.type === "paragraph" &&
-        node.content &&
+        Array.isArray(node.content) &&
         node.content.length > 0
     );
 
-    if (!firstTextNode?.content) {
+    if (!firstParagraph || !Array.isArray(firstParagraph.content)) {
       return "";
     }
 
-    return firstTextNode.content
-      .filter((node) => node.type === "text")
-      .map((node) => node.text || "")
+    return firstParagraph.content
+      .filter(
+        (
+          node
+        ): node is typeof node & {
+          text: string;
+        } =>
+          node.type === "text" &&
+          typeof node.text === "string"
+      )
+      .map((node) => node.text)
       .join("")
       .trim()
       .slice(0, 100);
@@ -70,7 +86,7 @@ export default function CreatePage() {
     const title = getTitle();
 
     if (!title) {
-      setMessage("Start your article with a paragraph.");
+      setMessage("Start your article with some text.");
       return;
     }
 
@@ -81,9 +97,11 @@ export default function CreatePage() {
     try {
       const response = await fetch("/api/posts", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           title,
           content,
@@ -106,7 +124,7 @@ export default function CreatePage() {
 
       editor.commands.clearContent();
     } catch (error) {
-      console.error(error);
+      console.error("Publish error:", error);
 
       setMessage(
         error instanceof Error
@@ -123,6 +141,7 @@ export default function CreatePage() {
 
     try {
       await navigator.clipboard.writeText(shareUrl);
+
       setMessage("Link copied!");
     } catch {
       setMessage("Unable to copy link.");
@@ -144,12 +163,13 @@ export default function CreatePage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-2xl px-5 py-5">
+
         {/* Header */}
-        <header className="mb-7 flex items-center justify-between">
+        <header className="mb-8 flex items-center justify-between">
           <button
             type="button"
             onClick={() => router.back()}
-            className="text-sm text-gray-500"
+            className="text-sm text-gray-500 transition hover:text-gray-900"
           >
             ← Back
           </button>
@@ -162,7 +182,7 @@ export default function CreatePage() {
             type="button"
             onClick={savePost}
             disabled={saving}
-            className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving ? "Publishing..." : "Publish"}
           </button>
@@ -177,14 +197,16 @@ export default function CreatePage() {
           <EditorContent editor={editor} />
         </section>
 
-        {/* Toolbar */}
-        <div className="sticky bottom-4 mt-6 flex gap-1 overflow-x-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
+        {/* Formatting toolbar */}
+        <div className="sticky bottom-4 mt-8 flex gap-1 overflow-x-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
+
+          {/* Bold */}
           <button
             type="button"
             onClick={() =>
               editor.chain().focus().toggleBold().run()
             }
-            className={`rounded-lg px-3 py-2 text-sm font-bold ${
+            className={`rounded-lg px-3 py-2 text-sm font-bold transition ${
               editor.isActive("bold")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -193,12 +215,13 @@ export default function CreatePage() {
             B
           </button>
 
+          {/* Italic */}
           <button
             type="button"
             onClick={() =>
               editor.chain().focus().toggleItalic().run()
             }
-            className={`rounded-lg px-3 py-2 text-sm italic ${
+            className={`rounded-lg px-3 py-2 text-sm italic transition ${
               editor.isActive("italic")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -207,6 +230,7 @@ export default function CreatePage() {
             I
           </button>
 
+          {/* Heading */}
           <button
             type="button"
             onClick={() =>
@@ -216,7 +240,7 @@ export default function CreatePage() {
                 .toggleHeading({ level: 2 })
                 .run()
             }
-            className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
               editor.isActive("heading", { level: 2 })
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -225,6 +249,7 @@ export default function CreatePage() {
             H2
           </button>
 
+          {/* Bullet list */}
           <button
             type="button"
             onClick={() =>
@@ -234,7 +259,7 @@ export default function CreatePage() {
                 .toggleBulletList()
                 .run()
             }
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm ${
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
               editor.isActive("bulletList")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -243,6 +268,7 @@ export default function CreatePage() {
             • List
           </button>
 
+          {/* Ordered list */}
           <button
             type="button"
             onClick={() =>
@@ -252,7 +278,7 @@ export default function CreatePage() {
                 .toggleOrderedList()
                 .run()
             }
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm ${
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
               editor.isActive("orderedList")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -261,6 +287,7 @@ export default function CreatePage() {
             1. List
           </button>
 
+          {/* Quote */}
           <button
             type="button"
             onClick={() =>
@@ -270,7 +297,7 @@ export default function CreatePage() {
                 .toggleBlockquote()
                 .run()
             }
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm ${
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
               editor.isActive("blockquote")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -280,7 +307,7 @@ export default function CreatePage() {
           </button>
         </div>
 
-        {/* Status */}
+        {/* Status message */}
         {message && (
           <p className="mt-4 text-center text-sm text-gray-500">
             {message}
@@ -305,7 +332,7 @@ export default function CreatePage() {
               <button
                 type="button"
                 onClick={copyLink}
-                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white"
+                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
               >
                 Copy
               </button>
