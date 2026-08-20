@@ -42,14 +42,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const databaseHost =
-      process.env.DATABASE_URL?.match(/@([^/]+)/)?.[1];
-
-    console.log(
-      "DATABASE HOST:",
-      databaseHost ?? "DATABASE_URL missing"
-    );
-
     const post = await prisma.post.create({
       data: {
         title: title.trim(),
@@ -57,8 +49,6 @@ export async function POST(request: Request) {
         contentJson: contentJson ?? null,
       },
     });
-
-    console.log("POST CREATED:", post.id);
 
     return NextResponse.json(
       {

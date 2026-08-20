@@ -43,18 +43,26 @@ export default function CreatePage() {
 
     const json = editor.getJSON();
 
-    const firstParagraph = json.content?.find(
-      (node) =>
-        node.type === "paragraph" &&
-        Array.isArray(node.content) &&
-        node.content.length > 0
-    );
+    // Prefer the first paragraph or heading with actual text content,
+    // but fall back to the first text-bearing node of any type so
+    // articles that open with a heading (or list, quote, etc.) still
+    // get a usable title instead of failing validation.
+    const firstTextNode =
+      json.content?.find(
+        (node) =>
+          (node.type === "paragraph" || node.type === "heading") &&
+          Array.isArray(node.content) &&
+          node.content.length > 0
+      ) ??
+      json.content?.find(
+        (node) => Array.isArray(node.content) && node.content.length > 0
+      );
 
-    if (!firstParagraph || !Array.isArray(firstParagraph.content)) {
+    if (!firstTextNode || !Array.isArray(firstTextNode.content)) {
       return "";
     }
 
-    return firstParagraph.content
+    return firstTextNode.content
       .filter((node) => node.type === "text")
       .map((node) => (node as { text: string }).text)
       .join("")
@@ -109,7 +117,7 @@ export default function CreatePage() {
         );
       }
 
-      const postUrl = `\( {window.location.origin}/article/ \){data.post.id}`;
+      const postUrl = `${window.location.origin}/article/${data.post.id}`;
 
       setShareUrl(postUrl);
       setMessage("Article published successfully 🎉");

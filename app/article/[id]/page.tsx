@@ -163,6 +163,27 @@ function renderNode(
     case "hardBreak":
       return <br key={index} />;
 
+    case "codeBlock": {
+      const code =
+        node.content
+          ?.map((child: any) => child.text ?? "")
+          .join("") ?? "";
+
+      return (
+        <pre
+          key={index}
+          className="mb-6 overflow-x-auto rounded-lg bg-gray-100 p-4 text-sm leading-6 text-gray-800"
+        >
+          <code>{code}</code>
+        </pre>
+      );
+    }
+
+    case "horizontalRule":
+      return (
+        <hr key={index} className="my-8 border-t border-gray-200" />
+      );
+
     default:
       return (
         <div key={index}>
