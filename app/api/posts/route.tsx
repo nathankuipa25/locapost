@@ -26,11 +26,18 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { title, content } = body;
+    const { title, content, contentJson } = body;
 
-    if (!title || !content) {
+    if (!title?.trim()) {
       return NextResponse.json(
-        { error: "Title and content are required." },
+        { error: "Article title is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!content?.trim()) {
+      return NextResponse.json(
+        { error: "Article content is required." },
         { status: 400 }
       );
     }
@@ -38,12 +45,16 @@ export async function POST(request: Request) {
     const databaseHost =
       process.env.DATABASE_URL?.match(/@([^/]+)/)?.[1];
 
-    console.log("DATABASE HOST:", databaseHost ?? "DATABASE_URL missing");
+    console.log(
+      "DATABASE HOST:",
+      databaseHost ?? "DATABASE_URL missing"
+    );
 
     const post = await prisma.post.create({
       data: {
         title: title.trim(),
-        content,
+        content: content.trim(),
+        contentJson: contentJson ?? null,
       },
     });
 
@@ -51,7 +62,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        message: "Post saved successfully.",
+        message: "Article published successfully.",
         post,
       },
       { status: 201 }
@@ -61,7 +72,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error: "Something went wrong while saving the post.",
+        error: "Something went wrong while publishing the article.",
       },
       { status: 500 }
     );

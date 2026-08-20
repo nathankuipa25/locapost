@@ -8,23 +8,53 @@ import StarterKit from "@tiptap/starter-kit";
 export default function CreatePage() {
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
   const [shareUrl, setShareUrl] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [2, 3],
+        },
+      }),
+    ],
     content: "",
     immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class:
+          "min-h-[420px] outline-none text-[17px] leading-8 text-gray-800",
+      },
+    },
   });
 
-  const savePost = async () => {
-    if (!title.trim()) {
-      setMessage("Please enter a title.");
-      return;
+  const getTitle = () => {
+    if (!editor) return "";
+
+    const json = editor.getJSON();
+
+    const firstTextNode = json.content?.find(
+      (node) =>
+        node.type === "paragraph" &&
+        node.content &&
+        node.content.length > 0
+    );
+
+    if (!firstTextNode?.content) {
+      return "";
     }
 
+    return firstTextNode.content
+      .filter((node) => node.type === "text")
+      .map((node) => node.text || "")
+      .join("")
+      .trim()
+      .slice(0, 100);
+  };
+
+  const savePost = async () => {
     if (!editor) {
       setMessage("Editor is not ready.");
       return;
@@ -33,7 +63,14 @@ export default function CreatePage() {
     const content = editor.getText().trim();
 
     if (!content) {
-      setMessage("Please write something first.");
+      setMessage("Start writing your article first.");
+      return;
+    }
+
+    const title = getTitle();
+
+    if (!title) {
+      setMessage("Start your article with a paragraph.");
       return;
     }
 
@@ -48,8 +85,9 @@ export default function CreatePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: title.trim(),
+          title,
           content,
+          contentJson: editor.getJSON(),
         }),
       });
 
@@ -57,16 +95,15 @@ export default function CreatePage() {
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Something went wrong while saving the post."
+          data.error || "Something went wrong while publishing."
         );
       }
 
-      const postUrl = `${window.location.origin}/p/${data.post.id}`;
+      const postUrl = `${window.location.origin}/article/${data.post.id}`;
 
       setShareUrl(postUrl);
-      setMessage("Post published successfully.");
+      setMessage("Article published successfully 🎉");
 
-      setTitle("");
       editor.commands.clearContent();
     } catch (error) {
       console.error(error);
@@ -74,7 +111,7 @@ export default function CreatePage() {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong while saving the post."
+          : "Something went wrong while publishing."
       );
     } finally {
       setSaving(false);
@@ -92,11 +129,23 @@ export default function CreatePage() {
     }
   };
 
+  if (!editor) {
+    return (
+      <main className="min-h-screen bg-white">
+        <div className="mx-auto w-full max-w-2xl px-5 py-6">
+          <p className="text-sm text-gray-400">
+            Loading editor...
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-white">
-      <div className="mx-auto w-full max-w-2xl px-5 py-6">
+      <div className="mx-auto w-full max-w-2xl px-5 py-5">
         {/* Header */}
-        <header className="mb-8 flex items-center justify-between">
+        <header className="mb-7 flex items-center justify-between">
           <button
             type="button"
             onClick={() => router.back()}
@@ -105,42 +154,144 @@ export default function CreatePage() {
             ← Back
           </button>
 
-          <h1 className="text-base font-semibold text-gray-900">
-            Create
-          </h1>
+          <span className="text-sm font-semibold text-gray-900">
+            New article
+          </span>
 
-          <div className="w-10" />
+          <button
+            type="button"
+            onClick={savePost}
+            disabled={saving}
+            className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {saving ? "Publishing..." : "Publish"}
+          </button>
         </header>
 
-        {/* Title */}
-        <input
-          type="text"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="Post title"
-          className="w-full border-0 bg-transparent text-3xl font-bold tracking-tight text-gray-900 outline-none placeholder:text-gray-300"
-        />
+        {/* Writing area */}
+        <section>
+          <p className="mb-5 text-sm text-gray-400">
+            Start writing...
+          </p>
 
-        {/* Editor */}
-        <div className="mt-6 min-h-[300px]">
-          <EditorContent
-            editor={editor}
-            className="prose prose-gray max-w-none text-gray-800 outline-none"
-          />
+          <EditorContent editor={editor} />
+        </section>
+
+        {/* Toolbar */}
+        <div className="sticky bottom-4 mt-6 flex gap-1 overflow-x-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
+          <button
+            type="button"
+            onClick={() =>
+              editor.chain().focus().toggleBold().run()
+            }
+            className={`rounded-lg px-3 py-2 text-sm font-bold ${
+              editor.isActive("bold")
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            B
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              editor.chain().focus().toggleItalic().run()
+            }
+            className={`rounded-lg px-3 py-2 text-sm italic ${
+              editor.isActive("italic")
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            I
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleHeading({ level: 2 })
+                .run()
+            }
+            className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+              editor.isActive("heading", { level: 2 })
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            H2
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleBulletList()
+                .run()
+            }
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm ${
+              editor.isActive("bulletList")
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            • List
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleOrderedList()
+                .run()
+            }
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm ${
+              editor.isActive("orderedList")
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            1. List
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .toggleBlockquote()
+                .run()
+            }
+            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm ${
+              editor.isActive("blockquote")
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            Quote
+          </button>
         </div>
 
         {/* Status */}
         {message && (
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-center text-sm text-gray-500">
             {message}
           </p>
         )}
 
         {/* Share card */}
         {shareUrl && (
-          <div className="mt-6 rounded-xl border border-gray-200 p-4">
-            <p className="mb-3 text-sm font-medium text-gray-900">
-              Your LocaPost is live 🎉
+          <div className="mt-5 rounded-2xl border border-gray-200 p-4">
+            <p className="mb-3 text-sm font-semibold text-gray-900">
+              Your article is live 🎉
             </p>
 
             <div className="flex gap-2">
@@ -148,29 +299,19 @@ export default function CreatePage() {
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="min-w-0 flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-600 outline-none"
+                className="min-w-0 flex-1 rounded-xl bg-gray-100 px-3 py-2 text-xs text-gray-600 outline-none"
               />
 
               <button
                 type="button"
                 onClick={copyLink}
-                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
+                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white"
               >
                 Copy
               </button>
             </div>
           </div>
         )}
-
-        {/* Save */}
-        <button
-          type="button"
-          onClick={savePost}
-          disabled={saving}
-          className="mt-8 w-full rounded-xl bg-black py-3 text-sm font-medium text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {saving ? "Publishing..." : "Publish"}
-        </button>
       </div>
     </main>
   );
