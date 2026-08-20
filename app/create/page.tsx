@@ -36,7 +36,7 @@ export default function CreatePage() {
   /*
    * Use the first meaningful paragraph as the article title.
    * Tiptap's JSON nodes don't all have a `text` property,
-   * so we explicitly narrow the type before accessing it.
+   * so we cast after filtering by type.
    */
   const getTitle = () => {
     if (!editor) return "";
@@ -55,13 +55,8 @@ export default function CreatePage() {
     }
 
     return firstParagraph.content
-      .filter(
-        (node): node is { type: "text"; text: string } =>
-          node.type === "text" &&
-          "text" in node &&
-          typeof node.text === "string"
-      )
-      .map((node) => node.text)
+      .filter((node) => node.type === "text")
+      .map((node) => (node as { text: string }).text)
       .join("")
       .trim()
       .slice(0, 100);
