@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
@@ -189,7 +190,7 @@ export default function CreatePage() {
 
   if (!editor) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="flex-1 bg-white">
         <div className="mx-auto w-full max-w-2xl px-5 py-6">
           <p className="text-sm text-gray-400">
             Loading editor...
@@ -200,7 +201,7 @@ export default function CreatePage() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="flex-1 bg-white">
       <div className="mx-auto w-full max-w-2xl px-5 py-5">
 
         {/* Header */}
@@ -213,9 +214,12 @@ export default function CreatePage() {
             ← Back
           </button>
 
-          <span className="text-sm font-semibold text-gray-900">
-            New article
-          </span>
+          <Link
+            href="/"
+            className="text-sm font-semibold text-gray-900"
+          >
+            LocaPost
+          </Link>
 
           <button
             type="button"

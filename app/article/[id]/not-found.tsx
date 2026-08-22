@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function ArticleNotFound() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white px-5">
+    <main className="flex flex-1 items-center justify-center bg-white px-5">
       <div className="text-center">
         <p className="text-sm font-semibold text-gray-400">
           404
@@ -13,7 +13,7 @@ export default function ArticleNotFound() {
         </h1>
 
         <p className="mt-2 text-sm text-gray-500">
-          This article doesn't exist or is no longer available.
+          This article doesn&apos;t exist or is no longer available.
         </p>
 
         <Link

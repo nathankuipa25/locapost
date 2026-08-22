@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getReadingTime } from "@/lib/reading-time";
 import { getBaseUrl } from "@/lib/site-url";
+import { getDescription } from "@/lib/post-summary";
 import { ArticleShareButton } from "./share-button";
 
 type PageProps = {
@@ -10,30 +12,6 @@ type PageProps = {
     id: string;
   }>;
 };
-
-function getDescription(content: unknown, fallback: string) {
-  if (!content || typeof content !== "object") {
-    return fallback.slice(0, 160);
-  }
-
-  const json = content as {
-    content?: Array<{
-      content?: Array<{
-        text?: string;
-      }>;
-    }>;
-  };
-
-  const text =
-    json.content
-      ?.flatMap((node) => node.content ?? [])
-      .map((node) => node.text ?? "")
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim() || fallback;
-
-  return text.slice(0, 160);
-}
 
 export async function generateMetadata({
   params,
@@ -223,13 +201,16 @@ export default async function ArticlePage({
   const articleUrl = `${baseUrl}/article/${post.id}`;
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="flex-1 bg-white">
       <article className="mx-auto max-w-2xl px-5 py-10 sm:py-16">
         {/* Brand */}
         <div className="mb-12">
-          <span className="text-sm font-bold tracking-tight text-gray-900">
+          <Link
+            href="/"
+            className="text-sm font-bold tracking-tight text-gray-900"
+          >
             LocaPost
-          </span>
+          </Link>
         </div>
 
         {/* Header */}
