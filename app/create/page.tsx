@@ -9,6 +9,7 @@ export default function CreatePage() {
   const router = useRouter();
 
   const [shareUrl, setShareUrl] = useState("");
+  const [shareTitle, setShareTitle] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -30,6 +31,14 @@ export default function CreatePage() {
         class:
           "min-h-[420px] outline-none text-[17px] leading-8 text-gray-800",
       },
+    },
+
+    onUpdate: () => {
+      // If a published link is showing and the user starts writing a
+      // new article, clear the old share card instead of leaving it
+      // stuck at the top while a fresh draft is being written below.
+      setShareUrl((current) => (current ? "" : current));
+      setMessage((current) => (current ? "" : current));
     },
   });
 
@@ -119,10 +128,11 @@ export default function CreatePage() {
 
       const postUrl = `${window.location.origin}/article/${data.post.id}`;
 
-      setShareUrl(postUrl);
-      setMessage("Article published successfully 🎉");
-
       editor.commands.clearContent();
+
+      setShareUrl(postUrl);
+      setShareTitle(title);
+      setMessage("Article published successfully 🎉");
     } catch (error) {
       console.error("Publish error:", error);
 
@@ -134,6 +144,22 @@ export default function CreatePage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const shareLink = async () => {
+    if (!shareUrl) return;
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+        return;
+      } catch {
+        // User cancelled the native share sheet — nothing to do.
+        return;
+      }
+    }
+
+    await copyLink();
   };
 
   const copyLink = async () => {
@@ -349,6 +375,42 @@ export default function CreatePage() {
               >
                 Copy
               </button>
+            </div>
+
+            <p className="mb-2 mt-4 text-xs font-medium text-gray-500">
+              Share your article
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={shareLink}
+                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                Share
+              </button>
+
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `${shareTitle} ${shareUrl}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                WhatsApp
+              </a>
+
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                  shareTitle
+                )}&url=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                X
+              </a>
             </div>
           </div>
         )}

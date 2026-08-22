@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getReadingTime } from "@/lib/reading-time";
+import { getBaseUrl } from "@/lib/site-url";
+import { ArticleShareButton } from "./share-button";
 
 type PageProps = {
   params: Promise<{
@@ -52,15 +55,23 @@ export async function generateMetadata({
     post.content
   );
 
+  const baseUrl = await getBaseUrl();
+  const url = `${baseUrl}/article/${post.id}`;
+
   return {
     title: `${post.title} | LocaPost`,
     description,
+
+    alternates: {
+      canonical: url,
+    },
 
     openGraph: {
       title: post.title,
       description,
       type: "article",
       siteName: "LocaPost",
+      url,
       publishedTime: post.createdAt.toISOString(),
     },
 
@@ -207,6 +218,9 @@ export default async function ArticlePage({
   }
 
   const contentJson = post.contentJson as any;
+  const readingTime = getReadingTime(post.content);
+  const baseUrl = await getBaseUrl();
+  const articleUrl = `${baseUrl}/article/${post.id}`;
 
   return (
     <main className="min-h-screen bg-white">
@@ -224,7 +238,7 @@ export default async function ArticlePage({
             {post.title}
           </h1>
 
-          <div className="mt-5 flex items-center gap-2 text-sm text-gray-500">
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-gray-500">
             <span>
               {new Intl.DateTimeFormat("en", {
                 dateStyle: "medium",
@@ -233,7 +247,13 @@ export default async function ArticlePage({
 
             <span>·</span>
 
-            <span>LocaPost</span>
+            <span>
+              {readingTime} min read
+            </span>
+
+            <span className="ml-1">
+              <ArticleShareButton url={articleUrl} title={post.title} />
+            </span>
           </div>
         </header>
 
