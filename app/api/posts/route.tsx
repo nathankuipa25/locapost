@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 
 export async function GET() {
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.json(
+      { error: "You must be signed in to view your posts." },
+      { status: 401 }
+    );
+  }
+
   try {
     const posts = await prisma.post.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
+      where: { authorId: session.user.id },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ posts });
@@ -14,15 +23,22 @@ export async function GET() {
     console.error("GET /api/posts error:", error);
 
     return NextResponse.json(
-      {
-        error: "Something went wrong while fetching posts.",
-      },
+      { error: "Something went wrong while fetching posts." },
       { status: 500 }
     );
   }
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.json(
+      { error: "You must be signed in to publish an article." },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await request.json();
 
@@ -47,6 +63,7 @@ export async function POST(request: Request) {
         title: title.trim(),
         content: content.trim(),
         contentJson: contentJson ?? null,
+        authorId: session.user.id,
       },
     });
 
@@ -61,9 +78,7 @@ export async function POST(request: Request) {
     console.error("POST /api/posts error:", error);
 
     return NextResponse.json(
-      {
-        error: "Something went wrong while publishing the article.",
-      },
+      { error: "Something went wrong while publishing the article." },
       { status: 500 }
     );
   }

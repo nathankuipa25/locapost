@@ -1,114 +1,73 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { getReadingTime } from "@/lib/reading-time";
-import { getDescription } from "@/lib/post-summary";
-
-export const revalidate = 0;
-
-// Minimal shape used by the feed. Avoids depending on the generated
-// Prisma client's exact type here (it's produced at build time), while
-// still keeping the map callback below fully typed instead of `any`.
-type PostPreview = {
-  id: string;
-  title: string;
-  content: string;
-  contentJson: unknown;
-  createdAt: Date;
-};
+import { redirect } from "next/navigation";
+import { auth, signIn } from "@/auth";
 
 export default async function Home() {
-  const posts = await prisma.post.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
+  const session = await auth();
+
+  if (session?.user) {
+    redirect("/dashboard");
+  }
+
+  async function signInWithGoogle() {
+    "use server";
+    await signIn("google", { redirectTo: "/dashboard" });
+  }
 
   return (
-    <main className="flex-1 bg-white">
-      <div className="mx-auto w-full max-w-2xl px-5 py-10 sm:py-16">
-        {/* Hero */}
-        <section className="text-center">
-          <p className="mb-6 text-sm font-medium tracking-tight text-gray-900">
-            LocaPost
-          </p>
+    <main className="flex flex-1 items-center justify-center bg-white px-5">
+      <div className="w-full max-w-sm text-center">
+        <p className="mb-6 text-sm font-medium tracking-tight text-gray-900">
+          LocaPost
+        </p>
 
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight text-gray-950 sm:text-5xl">
-            Write without limits.
-            <br />
-            Share with one link.
-          </h1>
+        <h1 className="text-4xl font-semibold leading-tight tracking-tight text-gray-950">
+          Write without limits.
+          <br />
+          Share with one link.
+        </h1>
 
-          <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-neutral-500 sm:text-base sm:leading-7">
-            Create rich content and share it anywhere with a single link.
-          </p>
+        <p className="mx-auto mt-5 max-w-xs text-sm leading-6 text-neutral-500">
+          Sign in to write, publish, and manage your own articles.
+        </p>
 
-          <Link
-            href="/create"
-            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xl bg-black px-6 text-sm font-medium text-white transition hover:bg-neutral-800 active:scale-[0.98]"
+        <form action={signInWithGoogle} className="mt-8">
+          <button
+            type="submit"
+            className="flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-white px-6 text-sm font-medium text-gray-900 transition hover:bg-neutral-50 active:scale-[0.98]"
           >
-            Create a post
-          </Link>
-        </section>
+            <GoogleIcon />
+            Continue with Google
+          </button>
+        </form>
 
-        {/* Feed */}
-        <section className="mt-16 sm:mt-20">
-          <h2 className="mb-6 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Recent articles
-          </h2>
-
-          {posts.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-neutral-200 px-6 py-10 text-center">
-              <p className="text-sm text-neutral-500">
-                No articles published yet.
-              </p>
-              <p className="mt-1 text-sm text-neutral-400">
-                Be the first to write one.
-              </p>
-            </div>
-          ) : (
-            <ul className="divide-y divide-neutral-100">
-              {posts.map((post: PostPreview) => {
-                const description = getDescription(
-                  post.contentJson,
-                  post.content,
-                  140
-                );
-                const readingTime = getReadingTime(post.content);
-
-                return (
-                  <li key={post.id} className="py-6 first:pt-0">
-                    <Link
-                      href={`/article/${post.id}`}
-                      className="group block"
-                    >
-                      <h3 className="text-lg font-semibold text-gray-950 transition group-hover:text-neutral-600">
-                        {post.title}
-                      </h3>
-
-                      {description && (
-                        <p className="mt-2 text-sm leading-6 text-neutral-500">
-                          {description}
-                        </p>
-                      )}
-
-                      <div className="mt-3 flex items-center gap-2 text-xs text-neutral-400">
-                        <span>
-                          {new Intl.DateTimeFormat("en", {
-                            dateStyle: "medium",
-                          }).format(post.createdAt)}
-                        </span>
-
-                        <span>·</span>
-
-                        <span>{readingTime} min read</span>
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
+        <p className="mt-6 text-xs leading-5 text-neutral-400">
+          New here? Signing in with Google creates your account
+          automatically — there&apos;s no separate registration step.
+        </p>
       </div>
     </main>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.56 2.7-3.87 2.7-6.62Z"
+      />
+      <path
+        fill="#34A853"
+        d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.95A9 9 0 0 0 0 9c0 1.45.35 2.83.95 4.03l3-2.33Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .95 4.97l3 2.33C4.66 5.17 6.65 3.58 9 3.58Z"
+      />
+    </svg>
   );
 }
