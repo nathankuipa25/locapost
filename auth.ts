@@ -1,17 +1,21 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+import authConfig from "@/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
+
   adapter: PrismaAdapter(prisma),
 
-  providers: [Google],
-
   session: {
-    // Database sessions — pairs naturally with the Prisma adapter and
-    // lets us revoke a session (e.g. account deletion) server-side.
-    strategy: "database",
+    // JWT sessions rather than database sessions. Middleware runs in
+    // the Edge Runtime and needs to verify a session by checking the
+    // signed token's signature alone — it can't make a Prisma/DB call
+    // to look up a Session row the way the "database" strategy needs.
+    // The adapter is still used to create/link User & Account rows on
+    // sign-in; it's only the session lookup itself that moves to JWT.
+    strategy: "jwt",
   },
 
   pages: {
@@ -21,12 +25,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   callbacks: {
-    session({ session, user }) {
+    jwt({ token, user }) {
+      // On sign-in, `user` (from the adapter) is available once —
+      // stash the database id on the token so it persists across
+      // requests without a DB lookup on every one.
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+
+    session({ session, token }) {
       // Expose the database user id on the session so server components
       // and API routes can scope queries to "the current user's own
       // posts" without an extra lookup.
-      if (session.user) {
-        session.user.id = user.id;
+      if (session.user && token.id) {
+        session.user.id = token.id as string;
       }
       return session;
     },

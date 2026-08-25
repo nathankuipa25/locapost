@@ -1,5 +1,11 @@
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
+import authConfig from "@/auth.config";
+
+// Deliberately built from the edge-safe authConfig (no Prisma adapter)
+// instead of importing the full "@/auth". Middleware runs in the Edge
+// Runtime, which can't load the Prisma client's Node.js-only modules.
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   if (!req.auth) {
