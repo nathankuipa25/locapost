@@ -6,6 +6,7 @@ import { getReadingTime } from "@/lib/reading-time";
 import { getBaseUrl } from "@/lib/site-url";
 import { getDescription } from "@/lib/post-summary";
 import { ArticleShareButton } from "./share-button";
+import { ViewTracker } from "./view-tracker";
 
 type PageProps = {
   params: Promise<{
@@ -203,6 +204,8 @@ export default async function ArticlePage({
   return (
     <main className="flex-1 bg-white">
       <article className="mx-auto max-w-2xl px-5 py-10 sm:py-16">
+        <ViewTracker postId={post.id} />
+
         {/* Brand */}
         <div className="mb-12">
           <Link
