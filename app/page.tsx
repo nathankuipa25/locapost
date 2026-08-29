@@ -46,39 +46,122 @@ export default async function Home() {
         </div>
 
         {/* Hero illustration */}
-        <div className="relative mx-auto mt-10 h-56 w-full max-w-[260px] sm:h-64 sm:max-w-xs">
+        <div className="relative mx-auto mt-10 flex h-56 w-full max-w-[260px] items-center justify-center sm:h-64 sm:max-w-xs">
           <div
             aria-hidden="true"
-            className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-violet-200/70 via-violet-100/50 to-transparent blur-2xl"
+            className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-violet-200/60 via-violet-100/40 to-transparent blur-2xl"
           />
 
-          <div
+          <svg
+            viewBox="0 0 280 220"
+            className="relative h-full w-full"
             aria-hidden="true"
-            className="absolute left-1/2 top-1/2 h-40 w-32 -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] rounded-2xl border border-violet-100 bg-white shadow-lg shadow-violet-200/60 sm:h-44 sm:w-36"
           >
-            <div className="flex h-full flex-col gap-2 p-4">
-              <div className="mb-1 h-8 w-8 rounded-lg bg-violet-100" />
-              <div className="h-2 w-4/5 rounded-full bg-violet-100" />
-              <div className="h-2 w-3/5 rounded-full bg-violet-100" />
-              <div className="mt-2 h-2 w-full rounded-full bg-neutral-100" />
-              <div className="h-2 w-full rounded-full bg-neutral-100" />
-              <div className="h-2 w-2/3 rounded-full bg-neutral-100" />
-            </div>
-          </div>
+            <defs>
+              <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#7c3aed" />
+                <stop offset="100%" stopColor="#4f46e5" />
+              </linearGradient>
 
-          <div
-            aria-hidden="true"
-            className="absolute bottom-3 right-2 flex h-11 w-11 rotate-[8deg] items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-300/60 sm:right-4"
-          >
-            <LinkIcon />
-          </div>
+              <filter
+                id="cardShadow"
+                x="-30%"
+                y="-30%"
+                width="160%"
+                height="160%"
+              >
+                <feDropShadow
+                  dx="0"
+                  dy="10"
+                  stdDeviation="10"
+                  floodColor="#7c3aed"
+                  floodOpacity="0.18"
+                />
+              </filter>
+            </defs>
+
+            {/* Dashed connector looping from the card to the link badge */}
+            <path
+              d="M95 172 C 55 192, 118 210, 160 192 S 208 168, 204 152"
+              fill="none"
+              stroke="#c4b5fd"
+              strokeWidth="2"
+              strokeDasharray="5 6"
+              strokeLinecap="round"
+            />
+
+            {/* Document card */}
+            <g transform="rotate(-4 140 108)" filter="url(#cardShadow)">
+              <rect
+                x="80"
+                y="35"
+                width="130"
+                height="150"
+                rx="18"
+                fill="white"
+                stroke="#ede9fe"
+                strokeWidth="1.5"
+              />
+
+              {/* Image placeholder icon */}
+              <rect x="98" y="53" width="32" height="32" rx="8" fill="#ede9fe" />
+              <circle cx="107" cy="63" r="3.5" fill="#c4b5fd" />
+              <path d="M100 79 L110 67 L117 74 L124 65 L128 79 Z" fill="#c4b5fd" />
+
+              {/* Title lines beside the icon */}
+              <rect x="138" y="58" width="52" height="5" rx="2.5" fill="#ede9fe" />
+              <rect x="138" y="70" width="36" height="5" rx="2.5" fill="#ede9fe" />
+
+              {/* Body text lines */}
+              <rect x="98" y="102" width="94" height="5" rx="2.5" fill="#f3f4f6" />
+              <rect x="98" y="114" width="94" height="5" rx="2.5" fill="#f3f4f6" />
+              <rect x="98" y="126" width="66" height="5" rx="2.5" fill="#f3f4f6" />
+            </g>
+
+            {/* Sparkle accent */}
+            <path
+              d="M200 24 L202.5 30 L208 32.5 L202.5 35 L200 41 L197.5 35 L192 32.5 L197.5 30 Z"
+              fill="#a78bfa"
+            />
+
+            {/* Link badge */}
+            <g transform="rotate(8 208 170)">
+              <rect
+                x="188"
+                y="150"
+                width="40"
+                height="40"
+                rx="12"
+                fill="url(#badgeGrad)"
+              />
+
+              <g
+                transform="translate(198 160)"
+                stroke="white"
+                strokeWidth="2.2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M8 15H5a4.5 4.5 0 0 1 0-9h2" />
+                <path d="M12 6h2a4.5 4.5 0 0 1 0 9h-2" />
+                <line x1="7" y1="10.5" x2="13" y2="10.5" />
+              </g>
+            </g>
+          </svg>
         </div>
 
         {/* Feature row */}
-        <div className="mt-10 grid grid-cols-3 gap-2 text-center sm:mt-12">
-          <Feature icon={<LockIcon />} label="Your content stays private" />
-          <Feature icon={<LinkIcon small />} label="Share with one simple link" />
-          <Feature icon={<SlidersIcon />} label="You're in full control" />
+        <div className="mt-10 grid grid-cols-3 divide-x divide-neutral-200 text-center sm:mt-12">
+          <div className="px-1">
+            <Feature icon={<LockIcon />} label="Your content stays private" />
+          </div>
+          <div className="px-1">
+            <Feature icon={<LinkIcon small />} label="Share with one simple link" />
+          </div>
+          <div className="px-1">
+            <Feature icon={<SlidersIcon />} label="You're in full control" />
+          </div>
         </div>
 
         {/* Sign in */}
