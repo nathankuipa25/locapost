@@ -51,7 +51,7 @@ export function DeletePostButton({
       type="button"
       onClick={handleDelete}
       disabled={deleting}
-      className="text-sm text-red-500 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex min-h-11 items-center px-2 text-sm text-red-500 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {deleting ? "Deleting..." : "Delete"}
     </button>

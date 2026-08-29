@@ -38,7 +38,7 @@ export function ArticleShareButton({ url, title }: ArticleShareButtonProps) {
       <button
         type="button"
         onClick={handleShare}
-        className="rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
+        className="inline-flex min-h-9 items-center rounded-full border border-gray-200 px-3 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
       >
         Share
       </button>

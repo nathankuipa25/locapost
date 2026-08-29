@@ -229,7 +229,7 @@ export function PostEditor(props: PostEditorProps) {
           <button
             type="button"
             onClick={() => router.back()}
-            className="text-sm text-gray-500 transition hover:text-gray-900"
+            className="-ml-2 inline-flex min-h-11 items-center px-2 text-sm text-gray-500 transition hover:text-gray-900"
           >
             ← Back
           </button>
@@ -242,7 +242,7 @@ export function PostEditor(props: PostEditorProps) {
             type="button"
             onClick={savePost}
             disabled={saving}
-            className="rounded-full bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex min-h-11 items-center rounded-full bg-black px-4 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving
               ? props.mode === "edit"
@@ -267,7 +267,7 @@ export function PostEditor(props: PostEditorProps) {
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`rounded-lg px-3 py-2 text-sm font-bold transition ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-bold transition ${
               editor.isActive("bold")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -280,7 +280,7 @@ export function PostEditor(props: PostEditorProps) {
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`rounded-lg px-3 py-2 text-sm italic transition ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm italic transition ${
               editor.isActive("italic")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -295,7 +295,7 @@ export function PostEditor(props: PostEditorProps) {
             onClick={() =>
               editor.chain().focus().toggleHeading({ level: 2 }).run()
             }
-            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-semibold transition ${
               editor.isActive("heading", { level: 2 })
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -308,7 +308,7 @@ export function PostEditor(props: PostEditorProps) {
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm transition ${
               editor.isActive("bulletList")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -321,7 +321,7 @@ export function PostEditor(props: PostEditorProps) {
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm transition ${
               editor.isActive("orderedList")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
@@ -334,7 +334,7 @@ export function PostEditor(props: PostEditorProps) {
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm transition ${
               editor.isActive("blockquote")
                 ? "bg-black text-white"
                 : "text-gray-700 hover:bg-gray-100"
