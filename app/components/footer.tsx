@@ -9,7 +9,10 @@ export function Footer() {
         </p>
 
         <p className="text-xs text-neutral-400">
-          LocaPost — write. link. share.
+          LocaPost —{" "}
+          <span className="font-medium text-[#6D3FEA]">
+            write. link. share.
+          </span>
         </p>
       </div>
     </footer>

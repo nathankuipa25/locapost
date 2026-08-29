@@ -14,181 +14,203 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex-1 bg-gradient-to-b from-violet-50 via-white to-white">
-      <div className="mx-auto w-full max-w-sm px-5 pb-12 pt-8 sm:max-w-md sm:pt-12">
-        {/* Top bar */}
-        <div className="mb-8 flex items-center justify-between sm:mb-10">
-          <span className="text-base font-bold tracking-tight text-gray-950">
+    <main className="flex-1 bg-[#FCFCFE]">
+      <div className="mx-auto w-full max-w-[760px] px-6 pb-14 pt-8 sm:px-10 sm:pt-12">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <span className="text-xl font-bold tracking-tight text-[#111827] sm:text-2xl">
             LocaPost
           </span>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5DDF8] bg-[#F4F0FF] px-3 py-1.5 text-xs font-medium text-[#6D3FEA]">
             <ShieldIcon />
             Private by default
           </span>
         </div>
 
-        {/* Hero copy */}
-        <div className="text-center">
-          <h1 className="text-[2.25rem] font-extrabold leading-[1.1] tracking-tight text-gray-950 sm:text-5xl">
+        {/* Hero heading */}
+        <div className="mt-10 text-center sm:mt-14">
+          <h1 className="text-[2.25rem] font-extrabold leading-[1.08] tracking-tight text-[#111827] sm:text-[3.25rem]">
             Write without limits.
             <br />
             Share with{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-500 bg-clip-text text-transparent">
+            <span className="bg-[linear-gradient(135deg,_#9B7BFF,_#5B2BD6)] bg-clip-text text-transparent">
               one link.
             </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-xs text-[15px] leading-6 text-neutral-500">
+          {/* Hero description */}
+          <p className="mx-auto mt-6 max-w-[320px] text-[15px] leading-[1.6] text-[#626774] sm:max-w-[420px] sm:text-[17px]">
             LocaPost is your private space to write, publish, and share
             articles on your terms.
           </p>
         </div>
 
-        {/* Hero illustration */}
-        <div className="relative mx-auto mt-10 flex h-56 w-full max-w-[260px] items-center justify-center sm:h-64 sm:max-w-xs">
+        {/* Illustration */}
+        <div className="relative mx-auto mt-10 flex h-[260px] w-full max-w-[300px] items-center justify-center sm:h-[300px] sm:max-w-[340px]">
+          {/* Soft lavender wave behind everything */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-violet-200/60 via-violet-100/40 to-transparent blur-2xl"
+            className="absolute inset-x-0 bottom-0 h-[85%] rounded-[3rem] bg-gradient-to-b from-[#F4F0FF] to-transparent"
           />
 
           <svg
-            viewBox="0 0 280 220"
+            viewBox="0 0 240 280"
             className="relative h-full w-full"
             aria-hidden="true"
           >
             <defs>
               <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#7c3aed" />
-                <stop offset="100%" stopColor="#4f46e5" />
+                <stop offset="0%" stopColor="#9B7BFF" />
+                <stop offset="100%" stopColor="#5B2BD6" />
               </linearGradient>
 
               <filter
                 id="cardShadow"
-                x="-30%"
-                y="-30%"
-                width="160%"
-                height="160%"
+                x="-40%"
+                y="-40%"
+                width="180%"
+                height="180%"
               >
                 <feDropShadow
                   dx="0"
                   dy="10"
                   stdDeviation="10"
-                  floodColor="#7c3aed"
-                  floodOpacity="0.18"
+                  floodColor="#1e1450"
+                  floodOpacity="0.14"
                 />
               </filter>
             </defs>
 
-            {/* Dashed connector looping from the card to the link badge */}
+            {/* Decorative curved line entering from the left, behind the card */}
             <path
-              d="M95 172 C 55 192, 118 210, 160 192 S 208 168, 204 152"
+              d="M-10 130 C 25 108, 45 150, 70 138"
               fill="none"
-              stroke="#c4b5fd"
+              stroke="#E5DDF8"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+
+            {/* Decorative curved line on the right, behind the card */}
+            <path
+              d="M195 55 C 222 72, 214 100, 245 92"
+              fill="none"
+              stroke="#E5DDF8"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+
+            {/* Dashed curved path wrapping the lower-left of the card */}
+            <path
+              d="M35 205 C 0 235, 30 268, 85 258 S 150 235, 150 215"
+              fill="none"
+              stroke="#C4B5FD"
               strokeWidth="2"
               strokeDasharray="5 6"
               strokeLinecap="round"
             />
 
-            {/* Document card */}
-            <g transform="rotate(-4 140 108)" filter="url(#cardShadow)">
+            {/* Article card */}
+            <g transform="rotate(-3 120 130)" filter="url(#cardShadow)">
               <rect
-                x="80"
-                y="35"
-                width="130"
-                height="150"
-                rx="18"
+                x="30"
+                y="20"
+                width="150"
+                height="195"
+                rx="22"
                 fill="white"
-                stroke="#ede9fe"
+                stroke="#F0EBFF"
                 strokeWidth="1.5"
               />
 
-              {/* Image placeholder icon */}
-              <rect x="98" y="53" width="32" height="32" rx="8" fill="#ede9fe" />
-              <circle cx="107" cy="63" r="3.5" fill="#c4b5fd" />
-              <path d="M100 79 L110 67 L117 74 L124 65 L128 79 Z" fill="#c4b5fd" />
+              {/* Image placeholder icon, top-left */}
+              <rect x="52" y="44" width="36" height="36" rx="10" fill="#F4F0FF" />
+              <circle cx="62" cy="55" r="3.5" fill="#9B7BFF" />
+              <path
+                d="M55 73 L67 59 L75 68 L83 57 L88 73 Z"
+                fill="#9B7BFF"
+              />
 
-              {/* Title lines beside the icon */}
-              <rect x="138" y="58" width="52" height="5" rx="2.5" fill="#ede9fe" />
-              <rect x="138" y="70" width="36" height="5" rx="2.5" fill="#ede9fe" />
+              {/* Three short title lines beside the icon */}
+              <rect x="98" y="50" width="58" height="5" rx="2.5" fill="#E9E7F2" />
+              <rect x="98" y="62" width="46" height="5" rx="2.5" fill="#E9E7F2" />
+              <rect x="98" y="74" width="38" height="5" rx="2.5" fill="#E9E7F2" />
 
-              {/* Body text lines */}
-              <rect x="98" y="102" width="94" height="5" rx="2.5" fill="#f3f4f6" />
-              <rect x="98" y="114" width="94" height="5" rx="2.5" fill="#f3f4f6" />
-              <rect x="98" y="126" width="66" height="5" rx="2.5" fill="#f3f4f6" />
+              {/* Body content lines, varying widths */}
+              <rect x="52" y="108" width="106" height="5" rx="2.5" fill="#EDEDF2" />
+              <rect x="52" y="122" width="106" height="5" rx="2.5" fill="#EDEDF2" />
+              <rect x="52" y="136" width="92" height="5" rx="2.5" fill="#EDEDF2" />
+              <rect x="52" y="150" width="106" height="5" rx="2.5" fill="#EDEDF2" />
+              <rect x="52" y="164" width="70" height="5" rx="2.5" fill="#EDEDF2" />
             </g>
 
-            {/* Sparkle accent */}
-            <path
-              d="M200 24 L202.5 30 L208 32.5 L202.5 35 L200 41 L197.5 35 L192 32.5 L197.5 30 Z"
-              fill="#a78bfa"
-            />
+            {/* Small purple decorative strokes near the top-right of the card */}
+            <g stroke="#9B7BFF" strokeWidth="2" strokeLinecap="round">
+              <line x1="196" y1="18" x2="204" y2="10" />
+              <line x1="204" y1="22" x2="212" y2="18" />
+              <line x1="198" y1="30" x2="203" y2="34" />
+            </g>
 
-            {/* Link badge */}
-            <g transform="rotate(8 208 170)">
+            {/* Link badge, overlapping the card's lower-right corner */}
+            <g transform="rotate(6 175 215)">
               <rect
-                x="188"
-                y="150"
-                width="40"
-                height="40"
-                rx="12"
+                x="140"
+                y="185"
+                width="70"
+                height="60"
+                rx="18"
                 fill="url(#badgeGrad)"
               />
 
               <g
-                transform="translate(198 160)"
+                transform="translate(157 202)"
                 stroke="white"
-                strokeWidth="2.2"
+                strokeWidth="2.4"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="M8 15H5a4.5 4.5 0 0 1 0-9h2" />
-                <path d="M12 6h2a4.5 4.5 0 0 1 0 9h-2" />
-                <line x1="7" y1="10.5" x2="13" y2="10.5" />
+                <path d="M9 17H6a5 5 0 0 1 0-10h3" />
+                <path d="M14 7h3a5 5 0 0 1 0 10h-3" />
+                <line x1="8" y1="12" x2="15" y2="12" />
               </g>
             </g>
           </svg>
         </div>
 
-        {/* Feature row */}
-        <div className="mt-10 grid grid-cols-3 divide-x divide-neutral-200 text-center sm:mt-12">
-          <div className="px-1">
-            <Feature icon={<LockIcon />} label="Your content stays private" />
-          </div>
-          <div className="px-1">
-            <Feature icon={<LinkIcon small />} label="Share with one simple link" />
-          </div>
-          <div className="px-1">
-            <Feature icon={<SlidersIcon />} label="You're in full control" />
-          </div>
+        {/* Three product benefits */}
+        <div className="mt-8 grid grid-cols-3 divide-x divide-[#E5DDF8] text-center sm:mt-10">
+          <Feature icon={<LockIcon />} label="Your content stays private" />
+          <Feature icon={<LinkIcon />} label="Share with one simple link" />
+          <Feature icon={<SlidersIcon />} label="You're in full control" />
         </div>
 
-        {/* Sign in */}
-        <form action={signInWithGoogle} className="mt-10">
+        {/* Google authentication */}
+        <form action={signInWithGoogle} className="mt-9 sm:mt-11">
           <button
             type="submit"
-            className="flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-white px-6 text-[15px] font-medium text-gray-900 shadow-sm transition hover:bg-neutral-50 active:scale-[0.98]"
+            className="flex min-h-[52px] w-full items-center justify-center gap-3 rounded-2xl border border-[#E5DDF8] bg-white px-6 text-[15px] font-semibold text-[#111827] shadow-[0_8px_20px_rgba(30,20,80,0.06)] transition hover:bg-[#FBFAFF] active:scale-[0.98] sm:text-base"
           >
             <GoogleIcon />
             Continue with Google
           </button>
         </form>
 
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-violet-600">
+        {/* Security reassurance */}
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-sm text-[#6D3FEA]">
           <ShieldIcon />
           Secure, fast, and password-free
         </p>
 
-        {/* New here card */}
-        <div className="mt-6 flex items-start gap-3 rounded-2xl bg-violet-50 p-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100">
+        {/* New user card */}
+        <div className="mt-8 flex items-start gap-3.5 rounded-2xl border border-[#E5DDF8] bg-[#F9F7FF] p-5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F4F0FF]">
             <SparkleIcon />
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-900">New here?</p>
-            <p className="mt-0.5 text-sm leading-5 text-neutral-500">
+            <p className="text-base font-bold text-[#111827]">New here?</p>
+            <p className="mt-1 text-[15px] leading-6 text-[#626774]">
               Signing in with Google creates your account automatically — no
               separate registration.
             </p>
@@ -207,11 +229,13 @@ function Feature({
   label: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+    <div className="flex flex-col items-center gap-2.5 px-1">
+      <div className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-[#F4F0FF] text-[#6D3FEA] sm:h-14 sm:w-14">
         {icon}
       </div>
-      <p className="text-[11px] leading-4 text-neutral-500">{label}</p>
+      <p className="text-[12px] font-semibold leading-4 text-[#111827] sm:text-[13px]">
+        {label}
+      </p>
     </div>
   );
 }
@@ -238,8 +262,8 @@ function ShieldIcon() {
 function LockIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -254,20 +278,17 @@ function LockIcon() {
   );
 }
 
-function LinkIcon({ small }: { small?: boolean }) {
-  const size = small ? 18 : 20;
-
+function LinkIcon() {
   return (
     <svg
-      width={size}
-      height={size}
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={small ? "" : "text-white"}
       aria-hidden="true"
     >
       <path d="M9 17H7a5 5 0 0 1 0-10h2" />
@@ -280,8 +301,8 @@ function LinkIcon({ small }: { small?: boolean }) {
 function SlidersIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -303,11 +324,10 @@ function SlidersIcon() {
 function SparkleIcon() {
   return (
     <svg
-      width="16"
-      height="16"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
-      fill="currentColor"
-      className="text-violet-600"
+      fill="#6D3FEA"
       aria-hidden="true"
     >
       <path d="M12 2l1.8 5.4L19 9l-5.2 1.6L12 16l-1.8-5.4L5 9l5.2-1.6L12 2Z" />
@@ -318,7 +338,7 @@ function SparkleIcon() {
 
 function GoogleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.56 2.7-3.87 2.7-6.62Z"
