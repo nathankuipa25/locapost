@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Spinner } from "@/app/components/spinner";
 
 type PostEditorProps =
   | {
@@ -23,12 +24,25 @@ export function PostEditor(props: PostEditorProps) {
   const [shareTitle, setShareTitle] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkUrlInput, setLinkUrlInput] = useState("");
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: {
           levels: [2, 3],
+        },
+        link: {
+          openOnClick: false,
+          autolink: true,
+          linkOnPaste: true,
+          HTMLAttributes: {
+            class:
+              "font-medium text-[#6D3FEA] underline decoration-[#C4B5FD] underline-offset-2 hover:text-[#5425C9] hover:decoration-[#6D3FEA]",
+            rel: "noopener noreferrer nofollow",
+            target: "_blank",
+          },
         },
       }),
     ],
@@ -211,10 +225,55 @@ export function PostEditor(props: PostEditorProps) {
     }
   };
 
+  const openLinkDialog = () => {
+    if (!editor) return;
+
+    const existingHref = editor.getAttributes("link").href as
+      | string
+      | undefined;
+
+    setLinkUrlInput(existingHref ?? "");
+    setLinkDialogOpen(true);
+  };
+
+  const closeLinkDialog = () => {
+    setLinkDialogOpen(false);
+    setLinkUrlInput("");
+  };
+
+  const applyLink = () => {
+    if (!editor) return;
+
+    const raw = linkUrlInput.trim();
+
+    if (!raw) {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      closeLinkDialog();
+      return;
+    }
+
+    const href =
+      /^https?:\/\//i.test(raw) || raw.startsWith("mailto:")
+        ? raw
+        : `https://${raw}`;
+
+    editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
+
+    closeLinkDialog();
+  };
+
+  const removeLink = () => {
+    if (!editor) return;
+
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    closeLinkDialog();
+  };
+
   if (!editor) {
     return (
       <main className="flex-1 bg-white">
-        <div className="mx-auto w-full max-w-2xl px-5 py-6">
+        <div className="mx-auto flex w-full max-w-2xl items-center gap-2 px-5 py-6">
+          <Spinner className="h-4 w-4 text-gray-400" />
           <p className="text-sm text-gray-400">Loading editor...</p>
         </div>
       </main>
@@ -242,8 +301,9 @@ export function PostEditor(props: PostEditorProps) {
             type="button"
             onClick={savePost}
             disabled={saving}
-            className="inline-flex min-h-11 items-center rounded-full bg-black px-4 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-black px-4 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            {saving && <Spinner className="h-3.5 w-3.5" />}
             {saving
               ? props.mode === "edit"
                 ? "Saving..."
@@ -287,6 +347,34 @@ export function PostEditor(props: PostEditorProps) {
             }`}
           >
             I
+          </button>
+
+          {/* Link */}
+          <button
+            type="button"
+            onClick={openLinkDialog}
+            aria-label="Add link"
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 transition ${
+              editor.isActive("link")
+                ? "bg-black text-white"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 17H7a5 5 0 0 1 0-10h2" />
+              <path d="M15 7h2a5 5 0 0 1 0 10h-2" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
           </button>
 
           {/* Heading */}
@@ -411,6 +499,75 @@ export function PostEditor(props: PostEditorProps) {
           </div>
         )}
       </div>
+
+      {/* Link dialog */}
+      {linkDialogOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 px-4 pb-4 sm:items-center sm:pb-4"
+          onClick={closeLinkDialog}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="mb-3 text-sm font-semibold text-gray-900">
+              {editor.isActive("link") ? "Edit link" : "Add link"}
+            </p>
+
+            <input
+              type="url"
+              autoFocus
+              value={linkUrlInput}
+              onChange={(event) => setLinkUrlInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  applyLink();
+                }
+
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  closeLinkDialog();
+                }
+              }}
+              placeholder="https://example.com"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-gray-400"
+            />
+
+            <div className="mt-4 flex items-center justify-between gap-2">
+              {editor.isActive("link") ? (
+                <button
+                  type="button"
+                  onClick={removeLink}
+                  className="min-h-11 text-sm font-medium text-red-500 transition hover:text-red-700"
+                >
+                  Remove
+                </button>
+              ) : (
+                <span />
+              )}
+
+              <div className="ml-auto flex gap-2">
+                <button
+                  type="button"
+                  onClick={closeLinkDialog}
+                  className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm text-gray-500 transition hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={applyLink}
+                  className="inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                  {editor.isActive("link") ? "Update" : "Add link"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

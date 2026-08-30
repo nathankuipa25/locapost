@@ -77,6 +77,19 @@ function renderNode(
       if (mark.type === "italic") {
         content = <em>{content}</em>;
       }
+
+      if (mark.type === "link" && mark.attrs?.href) {
+        content = (
+          <a
+            href={mark.attrs.href}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="font-medium text-[#6D3FEA] underline decoration-[#C4B5FD] underline-offset-2 transition hover:text-[#5425C9] hover:decoration-[#6D3FEA]"
+          >
+            {content}
+          </a>
+        );
+      }
     }
 
     return <span key={index}>{content}</span>;
@@ -206,8 +219,28 @@ export default async function ArticlePage({
       <article className="mx-auto max-w-2xl px-5 py-10 sm:py-16">
         <ViewTracker postId={post.id} />
 
-        {/* Brand */}
-        <div className="mb-12">
+        {/* Back + brand */}
+        <div className="mb-12 flex items-center justify-between">
+          <Link
+            href="/"
+            className="-ml-2 inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-medium text-neutral-500 transition hover:text-gray-900"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Back
+          </Link>
+
           <Link
             href="/"
             className="text-sm font-bold tracking-tight text-gray-900"

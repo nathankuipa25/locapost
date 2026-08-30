@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Spinner } from "@/app/components/spinner";
+
 type DeletePostButtonProps = {
   postId: string;
   postTitle: string;
@@ -51,8 +53,9 @@ export function DeletePostButton({
       type="button"
       onClick={handleDelete}
       disabled={deleting}
-      className="inline-flex min-h-11 items-center px-2 text-sm text-red-500 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm text-red-500 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
     >
+      {deleting && <Spinner className="h-3.5 w-3.5" />}
       {deleting ? "Deleting..." : "Delete"}
     </button>
   );
