@@ -33,35 +33,50 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
 
-        let dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true, email: true },
-        });
-
-        // Bootstrap: promote a designated set of emails to ADMIN on
-        // sign-in, so a production deploy doesn't need direct DB
-        // access to create the first admin. Self-healing — add an
-        // email to ADMIN_EMAILS and it takes effect on their next
-        // sign-in, no manual SQL required.
-        const adminEmails = (process.env.ADMIN_EMAILS ?? "")
-          .split(",")
-          .map((email) => email.trim().toLowerCase())
-          .filter(Boolean);
-
-        if (
-          dbUser &&
-          dbUser.role !== "ADMIN" &&
-          dbUser.email &&
-          adminEmails.includes(dbUser.email.toLowerCase())
-        ) {
-          dbUser = await prisma.user.update({
+        // Wrapped defensively: this runs on every sign-in, so a
+        // transient DB hiccup or a not-yet-applied migration (missing
+        // the `role`/`createdAt` columns) must never take down sign-in
+        // for everyone — fall back to the last known role, or "USER".
+        try {
+          let dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            data: { role: "ADMIN" },
             select: { role: true, email: true },
           });
-        }
 
-        token.role = dbUser?.role ?? "USER";
+          // Bootstrap: promote a designated set of emails to ADMIN on
+          // sign-in, so a production deploy doesn't need direct DB
+          // access to create the first admin. Self-healing — add an
+          // email to ADMIN_EMAILS and it takes effect on their next
+          // sign-in, no manual SQL required.
+          const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+            .split(",")
+            .map((email) => email.trim().toLowerCase())
+            .filter(Boolean);
+
+          if (
+            dbUser &&
+            dbUser.role !== "ADMIN" &&
+            dbUser.email &&
+            adminEmails.includes(dbUser.email.toLowerCase())
+          ) {
+            dbUser = await prisma.user.update({
+              where: { id: user.id },
+              data: { role: "ADMIN" },
+              select: { role: true, email: true },
+            });
+          }
+
+          token.role = dbUser?.role ?? "USER";
+        } catch (error) {
+          console.error(
+            "jwt callback: failed to read/bootstrap user role — " +
+              "falling back to USER. If this persists, check that " +
+              "pending Prisma migrations have been applied.",
+            error
+          );
+
+          token.role = token.role ?? "USER";
+        }
       }
 
       return token;
