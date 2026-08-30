@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import authConfig from "@/auth.config";
+import type { Role } from "@/app/generated/prisma/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -73,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // an extra lookup.
       if (session.user && token.id) {
         session.user.id = token.id as string;
-        session.user.role = token.role ?? "USER";
+        session.user.role = (token.role ?? "USER") as Role;
       }
       return session;
     },
