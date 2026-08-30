@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { JSONContent } from "@tiptap/react";
 import { prisma } from "@/lib/prisma";
 import { getReadingTime } from "@/lib/reading-time";
 import { getBaseUrl } from "@/lib/site-url";
@@ -63,7 +64,7 @@ export async function generateMetadata({
 }
 
 function renderNode(
-  node: any,
+  node: JSONContent,
   index: number
 ): React.ReactNode {
   if (node.type === "text") {
@@ -97,7 +98,7 @@ function renderNode(
 
   const children =
     node.content?.map(
-      (child: any, childIndex: number) =>
+      (child: JSONContent, childIndex: number) =>
         renderNode(child, childIndex)
     ) ?? [];
 
@@ -169,7 +170,7 @@ function renderNode(
     case "codeBlock": {
       const code =
         node.content
-          ?.map((child: any) => child.text ?? "")
+          ?.map((child: JSONContent) => child.text ?? "")
           .join("") ?? "";
 
       return (
@@ -209,7 +210,11 @@ export default async function ArticlePage({
     notFound();
   }
 
-  const contentJson = post.contentJson as any;
+  // Prisma's contentJson column is typed as JsonValue (string | number |
+  // boolean | object | array | null); we know by construction (it's only
+  // ever written from editor.getJSON() in the editor) that it's really a
+  // Tiptap document, so we widen through `unknown` rather than `any`.
+  const contentJson = post.contentJson as unknown as JSONContent | null;
   const readingTime = getReadingTime(post.content);
   const baseUrl = await getBaseUrl();
   const articleUrl = `${baseUrl}/article/${post.id}`;
@@ -278,7 +283,7 @@ export default async function ArticlePage({
         <div className="text-[17px] leading-8 text-gray-800">
           {contentJson?.content ? (
             contentJson.content.map(
-              (node: any, index: number) =>
+              (node: JSONContent, index: number) =>
                 renderNode(node, index)
             )
           ) : (
