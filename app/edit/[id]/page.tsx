@@ -25,9 +25,10 @@ export default async function EditPage({ params }: EditPageProps) {
     notFound();
   }
 
-  // Only the article's own author can edit it — anyone else (including
-  // other signed-in users) gets bounced back to their own dashboard.
-  if (post.authorId !== session.user.id) {
+  // Only the article's own author — or an admin — can edit it. Anyone
+  // else (including other signed-in users) gets bounced back to their
+  // own dashboard.
+  if (post.authorId !== session.user.id && session.user.role !== "ADMIN") {
     redirect("/dashboard");
   }
 

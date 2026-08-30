@@ -30,7 +30,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     );
   }
 
-  if (existing.authorId !== session.user.id) {
+  if (existing.authorId !== session.user.id && session.user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "You don't have permission to edit this article." },
       { status: 403 }
@@ -102,7 +102,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
     );
   }
 
-  if (existing.authorId !== session.user.id) {
+  if (existing.authorId !== session.user.id && session.user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "You don't have permission to delete this article." },
       { status: 403 }

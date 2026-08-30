@@ -42,14 +42,25 @@ export default async function DashboardPage() {
             LocaPost
           </Link>
 
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="-mr-2 inline-flex min-h-11 items-center px-2 text-sm text-neutral-500 transition hover:text-gray-900"
-            >
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center">
+            {session.user.role === "ADMIN" && (
+              <Link
+                href="/admin"
+                className="inline-flex min-h-11 items-center px-2 text-sm text-neutral-500 transition hover:text-gray-900"
+              >
+                Admin
+              </Link>
+            )}
+
+            <form action={signOutAction}>
+              <button
+                type="submit"
+                className="-mr-2 inline-flex min-h-11 items-center px-2 text-sm text-neutral-500 transition hover:text-gray-900"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </header>
 
         {/* Account + primary action */}
