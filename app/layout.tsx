@@ -13,10 +13,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://locapost.xyz";
+
 export const metadata: Metadata = {
-  title: "LocaPost",
+  metadataBase: new URL(siteUrl),
+
+  title: {
+    default: "LocaPost — Write, Refine & Share on Your Terms",
+    template: "%s | LocaPost",
+  },
+
   description:
-    "Write without limits. Share with one link.",
+    "LocaPost is a private-first article platform for writing, refining, and sharing long-form content through simple permanent links.",
+
+  applicationName: "LocaPost",
+
+  openGraph: {
+    title: "LocaPost — Write, Refine & Share on Your Terms",
+    description:
+      "LocaPost is a private-first article platform for writing, refining, and sharing long-form content through simple permanent links.",
+    url: "/",
+    siteName: "LocaPost",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary",
+    title: "LocaPost — Write, Refine & Share on Your Terms",
+    description:
+      "LocaPost is a private-first article platform for writing, refining, and sharing long-form content through simple permanent links.",
+  },
 };
 
 export const viewport: Viewport = {

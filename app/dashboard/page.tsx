@@ -1,9 +1,18 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getReadingTime } from "@/lib/reading-time";
 import { DeletePostButton } from "@/app/components/delete-post-button";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 // Minimal shape used by the dashboard list. Avoids depending on the
 // generated Prisma client's exact type here (it's produced at build

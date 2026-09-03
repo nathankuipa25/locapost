@@ -1,9 +1,18 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { DeletePostButton } from "@/app/components/delete-post-button";
 import { DeleteUserButton } from "./delete-user-button";
 import { promoteUserAction, demoteUserAction } from "./actions";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 // Minimal shapes used by the admin lists below. Avoids depending on the
 // generated Prisma client's exact type here (it's produced at build

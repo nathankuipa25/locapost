@@ -1,8 +1,17 @@
 import { redirect, notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PostEditor } from "@/app/components/post-editor";
 import type { JSONContent } from "@tiptap/react";
+
+export const metadata: Metadata = {
+  title: "Edit post",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 type EditPageProps = {
   params: Promise<{ id: string }>;

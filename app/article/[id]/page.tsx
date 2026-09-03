@@ -26,7 +26,11 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: "Article not found | LocaPost",
+      title: "Article not found",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
@@ -39,11 +43,23 @@ export async function generateMetadata({
   const url = `${baseUrl}/article/${post.id}`;
 
   return {
-    title: `${post.title} | LocaPost`,
+    title: post.title,
     description,
 
     alternates: {
       canonical: url,
+    },
+
+    // Articles are reachable by anyone with the link (LocaPost's
+    // actual privacy model — private by default, shared deliberately
+    // via link), but that's not the same as "meant to be found via
+    // search." Crawling stays allowed (see robots.ts) so link-preview
+    // bots can still render Open Graph cards when a link is shared;
+    // `index: false` is what actually keeps the article out of search
+    // results.
+    robots: {
+      index: false,
+      follow: true,
     },
 
     openGraph: {
